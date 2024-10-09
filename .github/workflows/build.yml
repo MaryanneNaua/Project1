@@ -1,0 +1,55 @@
+name: Build Kivy/KivyMD APK
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check out the repository
+      uses: actions/checkout@v2
+
+    - name: Set up JDK
+      uses: actions/setup-java@v1
+      with:
+        java-version: '11'
+
+    - name: Install Python
+      uses: actions/setup-python@v2
+      with:
+        python-version: '3.8'
+
+    - name: Install Buildozer dependencies
+      run: |
+        sudo apt update
+        sudo apt install -y \
+            build-essential \
+            git \
+            python3-pip \
+            python3-setuptools \
+            python3-dev \
+            libffi-dev \
+            libssl-dev \
+            libjpeg-dev \
+            zlib1g-dev \
+            libglu1-mesa \
+            libncurses5-dev \
+            libopencv-dev
+
+    - name: Install Buildozer
+      run: pip install buildozer
+
+    - name: Build the APK
+      run: |
+        buildozer -v android debug
+
+    - name: Upload APK
+      uses: actions/upload-artifact@v2
+      with:
+        name: MyApp
+        path: bin/*.apk
